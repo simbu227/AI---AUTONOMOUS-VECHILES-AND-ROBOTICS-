@@ -1,0 +1,38 @@
+import pandas as pd 
+import numpy as np 
+
+# Simulated sensor data for a robotic car 
+data = { 
+    'time': pd.date_range(start='2025-01-01', periods=10, freq='S'), 
+    'front_sensor': np.random.randint(10, 100, 10),  # distance in cm 
+    'left_sensor': np.random.randint(10, 100, 10), 
+    'right_sensor': np.random.randint(10, 100, 10), 
+    'speed': np.random.randint(20, 60, 10)  # speed in km/h 
+} 
+
+# Create DataFrame 
+df = pd.DataFrame(data) 
+
+# Thresholds 
+SAFE_DISTANCE = 30  # in cm 
+
+# Function to decide action 
+def decide_action(row): 
+    if row['front_sensor'] < SAFE_DISTANCE: 
+        if row['left_sensor'] > row['right_sensor']: 
+            return 'Turn Left' 
+        else: 
+            return 'Turn Right' 
+    return 'Go Forward' 
+
+# Apply decision function 
+df['action'] = df.apply(decide_action, axis=1) 
+
+# Summary statistics 
+avg_speed = df['speed'].mean() 
+obstacle_rate = (df['front_sensor'] < SAFE_DISTANCE).sum() / len(df) 
+
+# Display results 
+print("Sensor Readings and Actions:\n", df) 
+print("\nAverage Speed:", round(avg_speed, 2), "km/h") 
+print("Obstacle Encounter Rate:", round(obstacle_rate * 100, 2), "%")
